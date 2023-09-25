@@ -1,0 +1,82 @@
+---
+title: "[project name]"
+subtitle: "Analysis"
+author: "[author]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+# TODO
+
+- Demographics summary
+- Analyses
+
+```{r, include=FALSE}
+
+# set knit options
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+# disable scientific notation
+options(scipen = 999) 
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+
+```
+
+# Get data
+
+```{r}
+
+data_processed <- read_csv("../../data/processed/data_processed.csv")
+
+```
+
+# Sample descriptives
+
+```{r}
+
+
+
+```
+
+# Analyses
+
+## Self-reported evalautions
+
+```{r}
+
+
+
+```
+
+## Evaluations on the Affect Misattribution Procedure
+
+```{r}
+
+
+
+```
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
+
