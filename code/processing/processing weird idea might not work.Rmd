@@ -1,0 +1,84 @@
+---
+title: "Improving future work demo"
+subtitle: "Data processing"
+author: "Ian Hussey"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+# TODO
+
+- Add data processing
+- Combine data frames
+- Save to disk
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(janitor) # for clean_names()
+
+```
+
+# Get data
+
+```{r}
+
+# demographics
+data_demographics_raw <- read_csv("../../data/raw/data_demographics_raw.csv")
+
+# affect attribution procedure
+data_amp_raw <- read_csv("../../data/raw/data_amp_raw.csv") 
+
+# self report measure
+data_selfreport_raw <- read_csv("../../data/raw/data_selfreport_raw.csv")
+
+```
+
+# Demographics
+
+```{r}
+
+
+
+```
+
+# Self-reports
+
+```{r}
+
+
+
+```
+
+# Affect Misattribution Procedure
+
+```{r}
+
+
+
+```
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
