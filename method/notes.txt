@@ -1,0 +1,1 @@
+Details of the method and its implementation go here. For example, copies of the questionnaires if they were given in paper format, or the code implication of the measures if completed digitally (e.g., the Qualtrics/PsychoPy/jsPsych/etc. files).
