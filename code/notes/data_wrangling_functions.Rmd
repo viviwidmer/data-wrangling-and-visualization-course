@@ -1,0 +1,250 @@
+---
+title: "Important functions for data wrangling"
+author: "Template: Ian Hussey; Content: [student name]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+
+# set knit options
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+# disable scientific notation
+options(scipen = 999) 
+
+```
+
+# Instructions
+
+Most data wrangling tasks can be accomplished with a relatively small number of functions. I've listed the most important ones here. 
+
+Use this file to keep notes about what a given function does in your own words, the situations where you would use it, and working examples. You can make use of built-in datasets to do this (e.g., `mtcars`) or load external data sets (although its easier to break the examples if you modify the data etc.).
+
+Learning how to wrangle data efficiently involves a combination of knowing how to break the problem down into smaller components; knowing which functions are available to accomplish each component operation and how to use them; how to search documentation to learn or refresh your knowledge of how a function works; and how to discover new functions that accomplish new component operations. 
+
+Remember that you can look up the help documentation for any function by typing a question mark followed by its name in the console, e.g., `?dplyr::mutate`. The help documentation provides details of a function's parameters and defaults, its outputs, and examples of its use. Note that when you can also open the help documentation for an entire package by typing the package name, e.g., `?dplyr`. This can be very useful to discover what other functions that package has: scroll down to the bottom of any help page and click the "Index" link to see all help pages for that package.
+
+I have prepended each function below with package it comes from so that you know. For example, `summarize` is listed as `dplyr::summarize`. Usually you don't have to do this when using a function, although you can use this to resolve a common bug known as name conflicts (see [this blog post](https://www.r-bloggers.com/2010/08/namespaces-and-name-conflicts/) for discussion). 
+
+# Dependencies
+
+The packages these functions come from, which must be loaded to use them.
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+library(janitor)
+
+```
+
+# Wrangling
+
+## round_half_up
+
+```{r}
+
+janitor::round_half_up()
+
+```
+
+## clean_names
+
+```{r}
+
+janitor::clean_names()
+
+```
+
+## filter
+
+```{r}
+
+dplyr::filter()
+
+```
+
+## slice
+
+```{r}
+
+dplyr::slice()
+
+```
+
+## select
+
+```{r}
+
+dplyr::select()
+
+```
+
+## rename
+
+```{r}
+
+dplyr::rename()
+
+```
+
+## mutate
+
+```{r}
+
+dplyr::mutate()
+
+```
+
+## case_when
+
+```{r}
+
+dplyr::case_when() # instead of ifelse()
+
+```
+
+## summarize
+
+```{r}
+
+dplyr::summarize() 
+
+```
+
+## count
+
+```{r}
+
+dplyr::count()
+
+```
+
+## distinct
+
+```{r}
+
+dplyr::distinct()
+
+```
+
+## group_by
+
+```{r}
+
+dplyr::group_by() # or ".by =" 
+
+```
+
+## rowwise
+
+```{r}
+
+dplyr::rowwise()
+
+```
+
+## lead
+
+```{r}
+
+dplyr::lead()
+
+```
+
+## lag
+
+```{r}
+
+dplyr::lag()
+
+```
+
+## joins
+
+```{r}
+
+dplyr::full_join()
+
+dplyr::left_join()
+
+dplyr::right_join()
+
+dplyr::inner_join()
+
+dplyr::semi_join()
+
+```
+
+## pivots
+
+```{r}
+
+tidyr::pivot_wider()
+
+tidyr::pivot_longer()
+
+```
+
+## drop_na
+
+```{r}
+
+tidyr::drop_na()
+
+```
+
+## separate
+
+```{r}
+
+tidyr::separate()
+
+```
+
+## fill
+
+```{r}
+
+tidyr::fill()
+
+```
+
+# Printing tables
+
+```{r}
+
+mtcars |> # example data
+  knitr::kable() |> # print a nicer looking table
+  kableExtra::kable_classic(full_width = FALSE) # print nicer again
+
+```
+
+# Other packages 
+
+Other packages you may need for wrangling which aren't covered here:
+
+- library(forcats). Everything to do with factors and factor levels. Useful for plotting and establishing reference levels for statistical tests.
+- library(stringr). Everything to do with strings, searching for strings, modifying strings, parsing them, etc.
+- library(lubridate). Everything to do with dates, parsing dates, converting date formats, etc. 
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
+
