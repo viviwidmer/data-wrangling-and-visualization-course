@@ -90,6 +90,16 @@ Relative paths only work in .Rmd files and not .R files. Even without RMarkdown'
 
 ```
 
+## colnames & dput
+
+```{r}
+
+# colnames()
+
+# dput(colnames())
+
+```
+
 # Wrangling
 
 ## the pipe: `%>%` or `|>`
