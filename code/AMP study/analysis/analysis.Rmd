@@ -40,7 +40,7 @@ library(tidyverse)
 
 ```{r}
 
-data_processed <- read_csv("../../data/processed/data_processed.csv")
+# data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
 
 ```
 
