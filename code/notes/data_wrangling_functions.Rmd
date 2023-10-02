@@ -34,6 +34,16 @@ Remember that you can look up the help documentation for any function by typing 
 
 I have prepended each function below with package it comes from so that you know. For example, `summarize` is listed as `dplyr::summarize`. Usually you don't have to do this when using a function, although you can use this to resolve a common bug known as name conflicts (see [this blog post](https://www.r-bloggers.com/2010/08/namespaces-and-name-conflicts/) for discussion). 
 
+# Resources (for this session and others)
+
+- You can find cheatsheets for the dplyr, tidyr, and RMarkdown in the /resources/cheatsheets folder.
+- The Open Source textbook R for Data Science (aka, [Wickham's R4DS](https://r4ds.hadley.nz/)) is invaluable. Hadley Wickham is the main developer of the "tidyverse" set of packages, including dplyr, tidyr, ggplot2, stringr, lubridate, and others. See its [section on data transformation](https://r4ds.hadley.nz/data-transform). 
+  - The entire second edition of the book is available at [https://r4ds.hadley.nz/](https://r4ds.hadley.nz/).
+  - The first edition is also available. It does some things better in my opinion, e.g., it has a better explanation of the pipe (`%>%` or `|>`). See [https://r4ds.had.co.nz/pipes.html](https://r4ds.had.co.nz/pipes.html). 
+  - The first edition also talks about RMarkdown, whereas the second edition has moved to a different technology called Quarto (which we won't cover, although they're similar). See [https://r4ds.had.co.nz/r-markdown.html](https://r4ds.had.co.nz/r-markdown.html).
+- For those of you who prefer to learn in an interactive environment, I now suggest this web app over Swirl as it is more user-friendly: [https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome](https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome).
+- For those of you who prefer some video content - although seeing other people code can never replace practicing coding yourself! - I can also recommend De Bruine et al.'s Open Source textbook and videos [Data Skills for Reproducible Research](https://psyteachr.github.io/reprores-v3/). E.g., see their page with links to videos for [dplyr](https://psyteachr.github.io/reprores-v3/dplyr.html) and [tidyr](https://psyteachr.github.io/reprores-v3/tidyr.html). 
+
 # Dependencies
 
 The packages these functions come from, which must be loaded to use them.
@@ -54,7 +64,7 @@ library(janitor)
 
 ```{r}
 
-janitor::round_half_up()
+# janitor::round_half_up()
 
 ```
 
@@ -62,7 +72,7 @@ janitor::round_half_up()
 
 ```{r}
 
-janitor::clean_names()
+# janitor::clean_names()
 
 ```
 
@@ -70,7 +80,7 @@ janitor::clean_names()
 
 ```{r}
 
-dplyr::filter()
+# dplyr::filter()
 
 ```
 
@@ -78,7 +88,7 @@ dplyr::filter()
 
 ```{r}
 
-dplyr::slice()
+# dplyr::slice()
 
 ```
 
@@ -86,7 +96,7 @@ dplyr::slice()
 
 ```{r}
 
-dplyr::select()
+# dplyr::select()
 
 ```
 
@@ -94,7 +104,7 @@ dplyr::select()
 
 ```{r}
 
-dplyr::rename()
+# dplyr::rename()
 
 ```
 
@@ -102,7 +112,7 @@ dplyr::rename()
 
 ```{r}
 
-dplyr::mutate()
+# dplyr::mutate()
 
 ```
 
@@ -110,7 +120,7 @@ dplyr::mutate()
 
 ```{r}
 
-dplyr::case_when() # instead of ifelse()
+# dplyr::case_when() # instead of ifelse()
 
 ```
 
@@ -118,7 +128,7 @@ dplyr::case_when() # instead of ifelse()
 
 ```{r}
 
-dplyr::summarize() 
+# dplyr::summarize() 
 
 ```
 
@@ -126,7 +136,7 @@ dplyr::summarize()
 
 ```{r}
 
-dplyr::count()
+# dplyr::count()
 
 ```
 
@@ -134,7 +144,7 @@ dplyr::count()
 
 ```{r}
 
-dplyr::distinct()
+# dplyr::distinct()
 
 ```
 
@@ -142,7 +152,7 @@ dplyr::distinct()
 
 ```{r}
 
-dplyr::group_by() # or ".by =" 
+# dplyr::group_by() # or ".by =" 
 
 ```
 
@@ -150,7 +160,7 @@ dplyr::group_by() # or ".by ="
 
 ```{r}
 
-dplyr::rowwise()
+# dplyr::rowwise()
 
 ```
 
@@ -158,7 +168,7 @@ dplyr::rowwise()
 
 ```{r}
 
-dplyr::lead()
+# dplyr::lead()
 
 ```
 
@@ -166,7 +176,7 @@ dplyr::lead()
 
 ```{r}
 
-dplyr::lag()
+# dplyr::lag()
 
 ```
 
@@ -174,15 +184,15 @@ dplyr::lag()
 
 ```{r}
 
-dplyr::full_join()
+# dplyr::full_join()
 
-dplyr::left_join()
+# dplyr::left_join()
 
-dplyr::right_join()
+# dplyr::right_join()
 
-dplyr::inner_join()
+# dplyr::inner_join()
 
-dplyr::semi_join()
+# dplyr::semi_join()
 
 ```
 
@@ -190,9 +200,9 @@ dplyr::semi_join()
 
 ```{r}
 
-tidyr::pivot_wider()
+# tidyr::pivot_wider()
 
-tidyr::pivot_longer()
+# tidyr::pivot_longer()
 
 ```
 
@@ -200,7 +210,7 @@ tidyr::pivot_longer()
 
 ```{r}
 
-tidyr::drop_na()
+# tidyr::drop_na()
 
 ```
 
@@ -208,7 +218,7 @@ tidyr::drop_na()
 
 ```{r}
 
-tidyr::separate()
+# tidyr::separate()
 
 ```
 
@@ -216,7 +226,7 @@ tidyr::separate()
 
 ```{r}
 
-tidyr::fill()
+# tidyr::fill()
 
 ```
 
@@ -224,9 +234,9 @@ tidyr::fill()
 
 ```{r}
 
-mtcars |> # example data
-  knitr::kable() |> # print a nicer looking table
-  kableExtra::kable_classic(full_width = FALSE) # print nicer again
+# mtcars |> # example data
+#   knitr::kable() |> # print a nicer looking table
+#   kableExtra::kable_classic(full_width = FALSE) # print nicer again
 
 ```
 
