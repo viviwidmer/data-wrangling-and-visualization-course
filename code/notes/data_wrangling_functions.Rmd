@@ -50,6 +50,7 @@ The packages these functions come from, which must be loaded to use them.
 
 ```{r}
 
+library(readr)
 library(dplyr)
 library(tidyr)
 library(knitr)
@@ -58,7 +59,29 @@ library(janitor)
 
 ```
 
+# Basics
+
+## read_csv 
+
+vs. `read.csv()`
+
+```{r}
+
+# readr::read_csv()
+
+```
+
 # Wrangling
+
+## the pipe: `%>%` or `|>`
+
+```{r}
+
+# %>%
+
+# |>
+
+```
 
 ## round_half_up
 
