@@ -65,9 +65,28 @@ library(janitor)
 
 vs. `read.csv()`
 
+*Always, always, always* use relative paths rather than absolute paths.
+
+- Absolute path (bad): "~/Ian/Desktop/my_project/data/data_raw.csv"
+- Relative path (good): "../data/data_raw.csv"
+
+When using relative paths: "../" means up one directory level, whereas "directory_name/" goes down one directory level.
+
+Relative paths will work on other machines, where absolute paths will break. 
+
+Relative paths only work in .Rmd files and not .R files. Even without RMarkdown's other benefits, this makes them worth using.
+
 ```{r}
 
 # readr::read_csv()
+
+```
+
+## dir.create
+
+```{r}
+
+# dir.create()
 
 ```
 
