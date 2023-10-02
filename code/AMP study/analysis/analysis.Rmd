@@ -1,7 +1,7 @@
 ---
-title: "[project name]"
+title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
 subtitle: "Analysis"
-author: "[author]"
+author: "Template: Ian Hussey; content: [Student name]"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -16,6 +16,7 @@ output:
 
 - Demographics summary
 - Analyses
+- ...?
 
 ```{r, include=FALSE}
 
