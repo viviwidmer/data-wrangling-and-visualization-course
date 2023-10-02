@@ -1,7 +1,7 @@
 ---
-title: "Improving future work demo"
+title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
 subtitle: "Data processing"
-author: "Ian Hussey"
+author: "Template: Ian Hussey; content: [Student name]"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -44,15 +44,17 @@ data_demographics_raw <- read_csv("../../../data/AMP study/raw/data_demographics
 data_demographics_raw_messy <- read.csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv")
 #data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv")
 
-# affect attribution procedure
-data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") 
-
 # self report measure
 data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv")
+
+# affect attribution procedure
+data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") 
 
 ```
 
 # Demographics
+
+TODO extract age and gender data into wide format
 
 ```{r}
 
@@ -60,7 +62,16 @@ data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw
 
 ```
 
+# Exclusions / data quality?
+
+```{r}
+
+
+```
+
 # Self-reports
+
+TODO extract self-reported evaluations and convert to a sum score
 
 ```{r}
 
@@ -69,6 +80,28 @@ data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw
 ```
 
 # Affect Misattribution Procedure
+
+TODO extract evaluations on the AMP test blocks and convert to an overall bias score
+
+```{r}
+
+
+
+```
+
+# Combine
+
+TODO combine demographics, self-reports and AMP into a single data frame in wide format, i.e., the processed data
+
+```{r}
+
+
+
+```
+
+# Write to disk
+
+TODO write the processed data to disk
 
 ```{r}
 
