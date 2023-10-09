@@ -76,7 +76,13 @@ Relative paths will work on other machines, where absolute paths will break.
 
 Relative paths only work in .Rmd files and not .R files. Even without RMarkdown's other benefits, this makes them worth using.
 
+Useful arguments:
+
+- `skip` can be used to skip the first N rows while reading the data
+
 ```{r}
+
+
 
 # readr::read_csv()
 
@@ -138,9 +144,16 @@ Relative paths only work in .Rmd files and not .R files. Even without RMarkdown'
 
 ## slice
 
+Slice is for retaining or dropping rows from a df.
+
+We might use it just after reading in files if there are junk rows at the header.
+
 ```{r}
 
 # dplyr::slice()
+
+mtcars # this should have 32 rows
+slice(mtcars, 2:n()) # this should have 31 rows
 
 ```
 
