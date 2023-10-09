@@ -31,6 +31,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 library(tidyverse)
 library(janitor) # for clean_names()
+library(stringr)
 
 ```
 
@@ -57,10 +58,11 @@ data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") |>
 
 ```{r}
 
-dat <- data_demographics_raw_messy |>
-  clean_names()
+# dat <- data_demographics_raw_messy |>
+#   filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis")) |>
+#   select(subject, date, time, trial_code, key_response)
 
-colnames(dat)
+
 
 ```
 
@@ -69,9 +71,54 @@ colnames(dat)
 
 TODO extract age and gender data into wide format
 
+## Option 1
+
 ```{r}
 
+dat <- data_demographics_raw |>
+  select(subject, date, time, trialcode, response)
 
+dat_gender <- dat |>
+  filter(trialcode == "gender") |>
+  rename(gender = response) |>
+  mutate(gender = tolower(gender),
+         # regex is useful and awful
+         gender = stringr::str_remove_all(gender, regex("\\W+")),
+         gender = case_when(gender == "female" ~ gender,
+                            gender == "male" ~ gender,
+                            gender == "nonbinary" ~ gender,
+                            gender == "woman" ~ "female",
+                            gender == "man" ~ "male",
+                            TRUE ~ "other/missing/error")) |>
+  select(-trialcode)
+
+dat_gender |>
+  count(gender)
+
+dat_age <- dat |>
+  filter(trialcode == "age") |>
+  rename(age = response) |>
+  mutate(age = as.numeric(age),
+         age = ifelse(is.na(age), "other/missing/error", age)) |>
+  select(-trialcode)
+
+dat_age |>
+  count(age)
+
+dat_age_gender <- 
+  full_join(dat_age, 
+            dat_gender,
+            by = c("subject", "date", "time"))
+
+```
+
+## Option 2
+
+```{r}
+
+dat_wide <- dat |>
+  pivot_wider(names_from = trialcode,
+              values_from = response)
 
 ```
 
