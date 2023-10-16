@@ -34,6 +34,8 @@ options(scipen = 999)
 ```{r}
 
 library(tidyverse)
+library(knitr)
+library(kableExtra)
 
 ```
 
@@ -41,15 +43,40 @@ library(tidyverse)
 
 ```{r}
 
-# data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
+data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
 
 ```
 
 # Sample descriptives
 
+Create tables with mean age, sd age, count of genders, and % of sample of each gender. 
+
 ```{r}
 
+data_processed |>
+  count(age)
 
+# data_processed |>
+#   mutate(age = as.numeric(age)) |>
+#   summarise(mean_age = mean(age, na.rm = TRUE),
+#             sd_age = sd(age, na.rm = TRUE)) |>
+#   mutate(mean_age = round(mean_age, 2),
+#          sd_age = round(sd_age, 2))
+
+data_processed |>
+  mutate(age = as.numeric(age)) |>
+  summarise(mean_age = mean(age, na.rm = TRUE),
+            sd_age = sd(age, na.rm = TRUE)) |>
+  mutate_all(.funs = janitor::round_half_up, digits = 2) |>
+  kable() |>
+  kable_classic(full_width = FALSE)
+
+
+vec <- c(0.5, 1.5, 2.5, 3.5, 4.5)
+
+round(vec, 0)
+
+janitor::round_half_up(vec, 0)
 
 ```
 
