@@ -45,25 +45,40 @@ library(kableExtra)
 
 data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
 
+data_processed_after_exclusions <- data_processed |>
+  filter(exclude_participant == "include")
+
 ```
 
 # Sample descriptives
 
-Create tables with mean age, sd age, count of genders, and % of sample of each gender. 
+## Sample size before exclusions
 
 ```{r}
 
 data_processed |>
-  count(age)
+  count() |>
+  kable() |>
+  kable_classic(full_width = FALSE)
 
-# data_processed |>
-#   mutate(age = as.numeric(age)) |>
-#   summarise(mean_age = mean(age, na.rm = TRUE),
-#             sd_age = sd(age, na.rm = TRUE)) |>
-#   mutate(mean_age = round(mean_age, 2),
-#          sd_age = round(sd_age, 2))
+```
 
-data_processed |>
+## Sample size after exclusions
+
+```{r}
+
+data_processed_after_exclusions |>
+  count() |>
+  kable() |>
+  kable_classic(full_width = FALSE)
+
+```
+
+## Age
+
+```{r}
+
+data_processed_after_exclusions |>
   mutate(age = as.numeric(age)) |>
   summarise(mean_age = mean(age, na.rm = TRUE),
             sd_age = sd(age, na.rm = TRUE)) |>
@@ -71,12 +86,45 @@ data_processed |>
   kable() |>
   kable_classic(full_width = FALSE)
 
+```
 
-vec <- c(0.5, 1.5, 2.5, 3.5, 4.5)
+## Gender
 
-round(vec, 0)
+```{r}
 
-janitor::round_half_up(vec, 0)
+data_processed_after_exclusions |> 
+  group_by(gender) |> 
+  summarise(n = n()) |> 
+  mutate(percent = round_half_up((n / sum(n)) * 100, 1)) |>
+  kable() |>
+  kable_classic(full_width = FALSE)
+
+```
+
+# Descriptive statistics
+
+## Self reported evaluations
+
+```{r}
+
+dat_mean_ratings <- data_processed_after_exclusions |>
+  summarise(evaluations_mean = mean(mean_evaluation, na.rm = TRUE),
+            evaluations_sd = sd(mean_evaluation, na.rm = TRUE)) |>
+  mutate(group = "full sample")
+
+dat_mean_ratings_by_gender <- data_processed_after_exclusions |>
+  group_by(group = gender) |>
+  summarise(evaluations_mean = mean(mean_evaluation, na.rm = TRUE),
+            evaluations_sd = sd(mean_evaluation, na.rm = TRUE))
+
+bind_rows(
+  dat_mean_ratings,
+  dat_mean_ratings_by_gender
+) |>
+  select(group, evaluations_mean, evaluations_sd) |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable() |>
+  kable_classic(full_width = FALSE)
 
 ```
 
