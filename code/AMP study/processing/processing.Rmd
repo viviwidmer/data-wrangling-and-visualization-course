@@ -223,13 +223,12 @@ data_processed <-
 
 ```{r}
 
-
-
 data_processed_with_master_exclusions <- data_processed |>
   mutate(exclude_participant = case_when(tolower(age) == "test" ~ "exclude",
                                          tolower(gender) == "test" ~ "exclude",
                                          proportion_fast_trials_amp > .10 ~ "exclude",
                                          exclude_duplicate_data == "exclude" ~ "exclude",
+                                         is.na(mean_evaluation) ~ "exclude",
                                          TRUE ~ "include"))
 
 
@@ -245,7 +244,7 @@ TODO write the processed data to disk
 dir.create("../../../data/AMP study/processed/")
 
 # save data to disk in that dir
-write_csv(data_processed,
+write_csv(data_processed_with_master_exclusions,
           "../../../data/AMP study/processed/data_processed.csv")
 
 ```
