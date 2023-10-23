@@ -122,13 +122,22 @@ dat_wide <- dat |>
 
 ```
 
-# Exclusions / data quality?
+# Exclusions / data quality
+
+## AMP
 
 ```{r}
 
-
+data_performance_criteria <- data_amp_raw |> 
+  filter(blockcode != "practice", 
+         trialcode != "instructions") |> 
+  mutate(latency_prob = if_else(latency < 100, TRUE, FALSE)) |> 
+  group_by(subject) |> 
+  summarize(proportion_fast_trials_amp = mean(latency_prob))
 
 ```
+
+
 
 # Self-reports
 
@@ -192,10 +201,37 @@ TODO combine demographics, self-reports and AMP into a single data frame in wide
 
 ```{r}
 
-data_processed <- 
+data_processed_temp <- 
   full_join(dat_age_gender,
             data_selfreport_combined,
+            by = "subject") |> 
+  full_join(data_performance_criteria, by = "subject")
+
+data_processed_duplicates <- data_processed_temp |>
+  count(subject) |>
+  mutate(exclude_duplicate_data = if_else(n > 1, "exclude", "include")) |>
+  select(-n)
+
+data_processed <- 
+  full_join(data_processed_temp,
+            data_processed_duplicates,
             by = "subject")
+
+```
+
+# Define master exclusions
+
+```{r}
+
+
+
+data_processed_with_master_exclusions <- data_processed |>
+  mutate(exclude_participant = case_when(tolower(age) == "test" ~ "exclude",
+                                         tolower(gender) == "test" ~ "exclude",
+                                         proportion_fast_trials_amp > .10 ~ "exclude",
+                                         exclude_duplicate_data == "exclude" ~ "exclude",
+                                         TRUE ~ "include"))
+
 
 ```
 
