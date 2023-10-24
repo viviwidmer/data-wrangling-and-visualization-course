@@ -12,12 +12,6 @@ output:
     toc_float: yes
 ---
 
-# TODO
-
-- Add data processing
-- Combine data frames
-- Save to disk
-
 ```{r, include=FALSE}
 
 knitr::opts_chunk$set(message = FALSE,
@@ -43,8 +37,8 @@ library(stringr)
 data_demographics_raw <- read_csv("../../../data/AMP study/raw/data_demographics_raw.csv") |>
   janitor::clean_names()
 
-data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2) |>
-  janitor::clean_names()
+# data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2) |>
+#   janitor::clean_names()
 
 # self report measure
 data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv") |>
@@ -56,69 +50,24 @@ data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") |>
 
 ```
 
-```{r}
-
-# dat <- data_demographics_raw_messy |>
-#   filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis")) |>
-#   select(subject, date, time, trial_code, key_response)
-
-
-
-```
-
-
 # Demographics
 
-TODO extract age and gender data into wide format
-
-## Option 1
-
 ```{r}
 
-dat <- data_demographics_raw |>
-  select(subject, date, time, trialcode, response)
-
-dat_gender <- dat |>
-  filter(trialcode == "gender") |>
-  rename(gender = response) |>
+dat_age_gender <- data_demographics_raw |>
+  select(subject, date, time, trialcode, response) |>
+  pivot_wider(names_from = trialcode,
+              values_from = response) |>
   mutate(gender = tolower(gender),
-         # regex is useful and awful
-         gender = stringr::str_remove_all(gender, regex("\\W+")),
+         gender = stringr::str_remove_all(gender, regex("\\W+")), # regex is both very useful and awful to write
          gender = case_when(gender == "female" ~ gender,
                             gender == "male" ~ gender,
                             gender == "nonbinary" ~ gender,
                             gender == "woman" ~ "female",
                             gender == "man" ~ "male",
-                            TRUE ~ "other/missing/error")) |>
-  select(-trialcode)
-
-dat_gender |>
-  count(gender)
-
-dat_age <- dat |>
-  filter(trialcode == "age") |>
-  rename(age = response) |>
-  mutate(age = as.numeric(age),
-         age = ifelse(is.na(age), "other/missing/error", age)) |>
-  select(-trialcode)
-
-dat_age |>
-  count(age)
-
-dat_age_gender <- 
-  full_join(dat_age, 
-            dat_gender,
-            by = c("subject", "date", "time"))
-
-```
-
-## Option 2
-
-```{r}
-
-dat_wide <- dat |>
-  pivot_wider(names_from = trialcode,
-              values_from = response)
+                            TRUE ~ "other/missing/error"),
+         age = case_when(str_detect(age, "^[0-9]+$") ~ age, # if the value is only numbers, keep it. 
+                         TRUE ~ "other/missing/error")) 
 
 ```
 
@@ -128,61 +77,40 @@ dat_wide <- dat |>
 
 ```{r}
 
-data_performance_criteria <- data_amp_raw |> 
+data_amp_performance_criteria <- data_amp_raw |> 
   filter(blockcode != "practice", 
          trialcode != "instructions") |> 
   mutate(latency_prob = if_else(latency < 100, TRUE, FALSE)) |> 
   group_by(subject) |> 
-  summarize(proportion_fast_trials_amp = mean(latency_prob))
+  summarize(proportion_fast_trials_amp = mean(latency_prob)) |>
+  mutate(exclude_amp_performance = ifelse(proportion_fast_trials_amp > 0.10, "exclude", "include"))
 
 ```
 
-
-
 # Self-reports
-
-TODO extract self-reported evaluations and convert to a sum score
 
 ```{r}
 
-data_selfreport <- data_selfreport_raw |>
-  select(time, subject, trialcode, response) |>
+# trial level data
+data_selfreport_trial_level <- data_selfreport_raw |>
+  select(subject, trialcode, response) |>
   filter(trialcode %in% c("like", "prefer", "positive")) |>
   rename(item = trialcode) |>
   filter(response != "Ctrl+'B'") |>
   mutate(response = as.numeric(response))
 
-data_selfreport_mean <- data_selfreport |>
+# mean scored
+data_selfreport_mean_score <- data_selfreport_trial_level |>
   group_by(subject) |>
   summarize(mean_evaluation = mean(response, na.rm = TRUE))
 
-
-
-# data_selfreport_mean2 <- data_selfreport |>
-#   summarize(mean_evaluation = mean(response, na.rm = TRUE), 
-#             .by = subject)
-
-# if code isn't working, step one is often to check what class your variables are
-lapply(data_selfreport, class)
-
-
-
-# data_selfreport_wide <- data_selfreport |>
-#   pivot_wider(names_from = "item",
-#               values_from = "response")
-#
-# data_selfreport <- 
-#   full_join(data_selfreport_wide,
-#             data_selfreport_mean,
-#             by = "subject")
-
-data_selfreport_combined <- 
-  full_join(data_selfreport |>
+# combined
+data_selfreport_scored <- 
+  full_join(data_selfreport_trial_level |>
               pivot_wider(names_from = "item",
                           values_from = "response"),
-            data_selfreport_mean,
+            data_selfreport_mean_score,
             by = "subject")
-
 
 ```
 
@@ -197,25 +125,23 @@ TODO extract evaluations on the AMP test blocks and convert to an overall bias s
 
 # Combine
 
-TODO combine demographics, self-reports and AMP into a single data frame in wide format, i.e., the processed data
-
 ```{r}
 
-data_processed_temp <- 
-  full_join(dat_age_gender,
-            data_selfreport_combined,
-            by = "subject") |> 
-  full_join(data_performance_criteria, by = "subject")
+# combine all dfs created in the previous chunks
+data_processed_temp <- dat_age_gender |>
+  full_join(data_selfreport_scored, by = "subject") |> 
+  full_join(data_amp_performance_criteria, by = "subject")
 
+# flag all subjects with more than one row in the wide-format data. these should be excluded in the analysis.
+# a more elaborate approach would be to track down the individual dupicate cases and determine which of the mulitiple cases should be retained. 
 data_processed_duplicates <- data_processed_temp |>
   count(subject) |>
   mutate(exclude_duplicate_data = if_else(n > 1, "exclude", "include")) |>
   select(-n)
 
-data_processed <- 
-  full_join(data_processed_temp,
-            data_processed_duplicates,
-            by = "subject")
+# join in the duplicates df
+data_processed_before_exclusions <- data_processed_temp |>
+  full_join(data_processed_duplicates, by = "subject")
 
 ```
 
@@ -223,20 +149,20 @@ data_processed <-
 
 ```{r}
 
-data_processed_with_master_exclusions <- data_processed |>
+# create a master exclude_participant variable
+data_processed <- data_processed_before_exclusions |>
   mutate(exclude_participant = case_when(tolower(age) == "test" ~ "exclude",
                                          tolower(gender) == "test" ~ "exclude",
-                                         proportion_fast_trials_amp > .10 ~ "exclude",
+                                         is.na(age) ~ "exclude",
+                                         is.na(gender) ~ "exclude",
+                                         exclude_amp_performance == "exclude" ~ "exclude",
                                          exclude_duplicate_data == "exclude" ~ "exclude",
                                          is.na(mean_evaluation) ~ "exclude",
                                          TRUE ~ "include"))
 
-
 ```
 
 # Write to disk
-
-TODO write the processed data to disk
 
 ```{r}
 
@@ -244,8 +170,7 @@ TODO write the processed data to disk
 dir.create("../../../data/AMP study/processed/")
 
 # save data to disk in that dir
-write_csv(data_processed_with_master_exclusions,
-          "../../../data/AMP study/processed/data_processed.csv")
+write_csv(data_processed, "../../../data/AMP study/processed/data_processed.csv")
 
 ```
 
