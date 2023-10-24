@@ -153,11 +153,14 @@ data_processed_before_exclusions <- data_processed_temp |>
 data_processed <- data_processed_before_exclusions |>
   mutate(exclude_participant = case_when(tolower(age) == "test" ~ "exclude",
                                          tolower(gender) == "test" ~ "exclude",
-                                         is.na(age) ~ "exclude",
+                                         is.na(mean_evaluation) ~ "exclude",
+                                         # in this case we will exclude participants with missing demographics data or outcomes measures data. 
+                                         # Note that "list-wise exclusions" like this aren't always justified, as missingness often isn't at random. 
+                                         # How to treat missing data is a  whole area of work in itself, which we wont cover here.
+                                         is.na(age) ~ "exclude", 
                                          is.na(gender) ~ "exclude",
                                          exclude_amp_performance == "exclude" ~ "exclude",
                                          exclude_duplicate_data == "exclude" ~ "exclude",
-                                         is.na(mean_evaluation) ~ "exclude",
                                          TRUE ~ "include"))
 
 ```
