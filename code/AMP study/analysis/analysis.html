@@ -1889,78 +1889,123 @@ stimuli using the Affective Misattribution Procedure (AMP) and
 self-reports</h1>
 <h3 class="subtitle">Analysis</h3>
 <h4 class="author">Template: Ian Hussey; content: [Student name]</h4>
-<h4 class="date">16 October, 2023</h4>
+<h4 class="date">24 October, 2023</h4>
 
 </div>
 
 
-<div id="todo" class="section level1">
-<h1>TODO</h1>
-<ul>
-<li>Demographics summary</li>
-<li>Analyses</li>
-<li>…?</li>
-</ul>
-</div>
 <div id="dependencies" class="section level1">
 <h1>Dependencies</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code></pre></div>
 </div>
-<div id="get-data" class="section level1">
-<h1>Get data</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>data_processed <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/processed/data_processed.csv&quot;</span>)</span></code></pre></div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<p>Load the processed data and apply the global exclusions.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>data_processed <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/processed/data_processed.csv&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>data_processed_after_exclusions <span class="ot">&lt;-</span> data_processed <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="fu">filter</span>(exclude_participant <span class="sc">==</span> <span class="st">&quot;include&quot;</span>)</span></code></pre></div>
 </div>
 <div id="sample-descriptives" class="section level1">
 <h1>Sample descriptives</h1>
-<p>Create tables with mean age, sd age, count of genders, and % of
-sample of each gender.</p>
+<div id="sample-size-before-exclusions" class="section level2">
+<h2>Sample size before exclusions</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>data_processed <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">count</span>(age)</span></code></pre></div>
-<pre><code>## # A tibble: 41 × 2
-##    age       n
-##    &lt;chr&gt; &lt;int&gt;
-##  1 18        1
-##  2 19        4
-##  3 20        1
-##  4 21        6
-##  5 22        2
-##  6 23        5
-##  7 24        1
-##  8 25        3
-##  9 26        4
-## 10 27        5
-## # ℹ 31 more rows</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># data_processed |&gt;</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#   mutate(age = as.numeric(age)) |&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#   summarise(mean_age = mean(age, na.rm = TRUE),</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#             sd_age = sd(age, na.rm = TRUE)) |&gt;</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#   mutate(mean_age = round(mean_age, 2),</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#          sd_age = round(sd_age, 2))</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>data_processed <span class="sc">|&gt;</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">as.numeric</span>(age)) <span class="sc">|&gt;</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_age =</span> <span class="fu">mean</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>            <span class="at">sd_age =</span> <span class="fu">sd</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="fu">mutate_all</span>(<span class="at">.funs =</span> janitor<span class="sc">::</span>round_half_up, <span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">count</span>(<span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="at">header =</span> <span class="fu">c</span>(<span class="st">&quot;Whole sample&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span> <span class="co"># note that you can add header rows to tables like this. The &quot;1&quot; indicates the number of columns the header should span. The sum of these numbers must equal the number of columns or you&#39;ll get an error.</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
-<th style="text-align:right;">
-mean_age
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Whole sample
+</div>
 </th>
+</tr>
+<tr>
 <th style="text-align:right;">
-sd_age
+n
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:right;">
-35.69
+102
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sample-size-after-exclusions" class="section level2">
+<h2>Sample size after exclusions</h2>
+<p>Sample used in subsequent analyses</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>data_processed_after_exclusions <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">count</span>(<span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="at">header =</span> <span class="fu">c</span>(<span class="st">&quot;For analysis&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+For analysis
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+n
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+90
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="age" class="section level2">
+<h2>Age</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>data_processed_after_exclusions <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">as.numeric</span>(age)) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>            <span class="at">SD =</span> <span class="fu">sd</span>(age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="fu">mutate_all</span>(<span class="at">.funs =</span> janitor<span class="sc">::</span>round_half_up, <span class="at">digits =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="at">header =</span> <span class="fu">c</span>(<span class="st">&quot;Age&quot;</span> <span class="ot">=</span> <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Age
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+36.8
 </td>
 <td style="text-align:right;">
 12.4
@@ -1968,25 +2013,201 @@ sd_age
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>vec <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">1.5</span>, <span class="fl">2.5</span>, <span class="fl">3.5</span>, <span class="fl">4.5</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">round</span>(vec, <span class="dv">0</span>)</span></code></pre></div>
-<pre><code>## [1] 0 2 2 4 4</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>janitor<span class="sc">::</span><span class="fu">round_half_up</span>(vec, <span class="dv">0</span>)</span></code></pre></div>
-<pre><code>## [1] 1 2 3 4 5</code></pre>
 </div>
-<div id="analyses" class="section level1">
-<h1>Analyses</h1>
+<div id="gender" class="section level2">
+<h2>Gender</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>data_processed_after_exclusions <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Gender =</span> gender) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">group_by</span>(Gender) <span class="sc">|&gt;</span> </span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Percent =</span> <span class="fu">paste0</span>(<span class="fu">round_half_up</span>((n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gender =</span> stringr<span class="sc">::</span><span class="fu">str_to_sentence</span>(Gender)) <span class="sc">|&gt;</span> <span class="co"># Change the case of the Gender variable so that it prints nicely</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Gender
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:left;">
+Percent
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:left;">
+43.3%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:left;">
+53.3%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nonbinary
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+3.3%
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="descriptives" class="section level1">
+<h1>Descriptives</h1>
+<p>Descriptive statistics and plots of the measures (excluding the
+demographics variables)</p>
+<div id="self-reported-evaluations" class="section level2">
+<h2>Self-reported evaluations</h2>
+<div id="descriptive-stats" class="section level3">
+<h3>Descriptive stats</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># overall self-reported evaluations</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>dat_mean_ratings <span class="ot">&lt;-</span> data_processed_after_exclusions <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(mean_evaluation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>            <span class="at">SD =</span> <span class="fu">sd</span>(mean_evaluation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="st">&quot;Full sample&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># self-reported evaluations by gender category</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>dat_mean_ratings_by_gender <span class="ot">&lt;-</span> data_processed_after_exclusions <span class="sc">|&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">group =</span> gender) <span class="sc">|&gt;</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(mean_evaluation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>            <span class="at">SD =</span> <span class="fu">sd</span>(mean_evaluation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co"># combine both into one table</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="fu">bind_rows</span>(dat_mean_ratings,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>          dat_mean_ratings_by_gender) <span class="sc">|&gt;</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Subset =</span> group, Mean, SD) <span class="sc">|&gt;</span> <span class="co"># select variables of interest, and rename one </span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Subset =</span> stringr<span class="sc">::</span><span class="fu">str_to_sentence</span>(Subset)) <span class="sc">|&gt;</span> <span class="co"># Change the case of the Subset variable so that it prints nicely</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, round_half_up, <span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="at">header =</span> <span class="fu">c</span>(<span class="st">&quot; &quot;</span> <span class="ot">=</span> <span class="dv">1</span>, <span class="st">&quot;Self-reported evaluations&quot;</span> <span class="ot">=</span> <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Self-reported evaluations
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Subset
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Full sample
+</td>
+<td style="text-align:right;">
+1.64
+</td>
+<td style="text-align:right;">
+1.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:right;">
+1.32
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+1.81
+</td>
+<td style="text-align:right;">
+1.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nonbinary
+</td>
+<td style="text-align:right;">
+3.33
+</td>
+<td style="text-align:right;">
+2.19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="descriptive-plots" class="section level3">
+<h3>Descriptive plots</h3>
+<p>TODO add descriptive plots for self-reported evaluations</p>
+</div>
+</div>
+<div id="amp-evaluations" class="section level2">
+<h2>AMP evaluations</h2>
+<div id="descriptive-stats-1" class="section level3">
+<h3>Descriptive stats</h3>
+<p>TODO add descriptive stats for AMP</p>
+</div>
+<div id="descriptive-plots-1" class="section level3">
+<h3>Descriptive plots</h3>
+<p>TODO add descriptive plots for AMP</p>
+</div>
+</div>
+</div>
+<div id="analyses-hypothesis-tests" class="section level1">
+<h1>Analyses &amp; hypothesis tests</h1>
 <div id="self-reported-evalautions" class="section level2">
 <h2>Self-reported evalautions</h2>
+<p>TODO add t test comparing self-reported evaluations between men and
+women</p>
 </div>
 <div id="evaluations-on-the-affect-misattribution-procedure" class="section level2">
 <h2>Evaluations on the Affect Misattribution Procedure</h2>
+<p>TODO add t test comparing AMP evaluations between men and women</p>
 </div>
 </div>
 <div id="session-info" class="section level1">
 <h1>Session info</h1>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>## R version 4.3.1 (2023-06-16)
 ## Platform: aarch64-apple-darwin20 (64-bit)
 ## Running under: macOS Sonoma 14.0
@@ -2005,9 +2226,10 @@ sd_age
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] kableExtra_1.3.4 knitr_1.43       lubridate_1.9.2  forcats_1.0.0   
-##  [5] stringr_1.5.0    dplyr_1.1.3      purrr_1.0.2      readr_2.1.4     
-##  [9] tidyr_1.3.0      tibble_3.2.1     ggplot2_3.4.3    tidyverse_2.0.0 
+##  [1] janitor_2.2.0    kableExtra_1.3.4 knitr_1.43       lubridate_1.9.2 
+##  [5] forcats_1.0.0    stringr_1.5.0    dplyr_1.1.3      purrr_1.0.2     
+##  [9] readr_2.1.4      tidyr_1.3.0      tibble_3.2.1     ggplot2_3.4.3   
+## [13] tidyverse_2.0.0 
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] sass_0.4.7        utf8_1.2.3        generics_0.1.3    xml2_1.3.5       
@@ -2019,11 +2241,10 @@ sd_age
 ## [25] withr_2.5.0       cachem_1.0.8      yaml_2.3.7        parallel_4.3.1   
 ## [29] tools_4.3.1       tzdb_0.4.0        colorspace_2.1-0  webshot_0.5.5    
 ## [33] vctrs_0.6.3       R6_2.5.1          lifecycle_1.0.3   snakecase_0.11.1 
-## [37] bit_4.0.5         vroom_1.6.3       janitor_2.2.0     pkgconfig_2.0.3  
-## [41] pillar_1.9.0      bslib_0.5.1       gtable_0.3.4      glue_1.6.2       
-## [45] systemfonts_1.0.4 highr_0.10        xfun_0.40         tidyselect_1.2.0 
-## [49] rstudioapi_0.15.0 htmltools_0.5.6   rmarkdown_2.24    svglite_2.1.1    
-## [53] compiler_4.3.1</code></pre>
+## [37] bit_4.0.5         vroom_1.6.3       pkgconfig_2.0.3   pillar_1.9.0     
+## [41] bslib_0.5.1       gtable_0.3.4      glue_1.6.2        systemfonts_1.0.4
+## [45] highr_0.10        xfun_0.40         tidyselect_1.2.0  rstudioapi_0.15.0
+## [49] htmltools_0.5.6   rmarkdown_2.24    svglite_2.1.1     compiler_4.3.1</code></pre>
 </div>
 
 
