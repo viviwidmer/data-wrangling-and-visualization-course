@@ -85,7 +85,23 @@ data_amp_performance_criteria <- data_amp_raw |>
   summarize(proportion_fast_trials_amp = mean(latency_prob)) |>
   mutate(exclude_amp_performance = ifelse(proportion_fast_trials_amp > 0.10, "exclude", "include"))
 
+# determine modal number of trials
+data_amp_completeness <- data_amp_raw |>
+  filter(blockcode != "practice",
+         trialcode != "instructions") |>
+  group_by(subject) |>
+  count() |>
+  ungroup() |>
+  mutate(exclude_amp_completeness = ifelse(n == 72, "include", "exclude")) |>
+  select(-n)
+
+# data_amp_completeness |>
+#   count(n)
+
 ```
+
+- One participant with 8 trials appears to be a partial completion (check raw data?)
+- One participant with 144 trials appears to be a repeat participant. I've chosen to exclude them entirely, but you could also have a more elaborate strategy where you retain only their first completion.
 
 # Self-reports
 
@@ -130,7 +146,8 @@ TODO extract evaluations on the AMP test blocks and convert to an overall bias s
 # combine all dfs created in the previous chunks
 data_processed_temp <- dat_age_gender |>
   full_join(data_selfreport_scored, by = "subject") |> 
-  full_join(data_amp_performance_criteria, by = "subject")
+  full_join(data_amp_performance_criteria, by = "subject") |>
+  full_join(data_amp_completeness, by = "subject")
 
 # flag all subjects with more than one row in the wide-format data. these should be excluded in the analysis.
 # a more elaborate approach would be to track down the individual dupicate cases and determine which of the mulitiple cases should be retained. 
@@ -161,6 +178,7 @@ data_processed <- data_processed_before_exclusions |>
                                          is.na(gender) ~ "exclude",
                                          exclude_amp_performance == "exclude" ~ "exclude",
                                          exclude_duplicate_data == "exclude" ~ "exclude",
+                                         exclude_amp_completeness == "exclude" ~ "exclude", 
                                          TRUE ~ "include"))
 
 ```
