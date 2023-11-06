@@ -136,6 +136,37 @@ TODO extract evaluations on the AMP test blocks and convert to an overall bias s
 
 ```{r}
 
+data_amp_score_congruence <- data_amp_raw |> 
+  select(subject, evaluative_response = correct, trialcode, blockcode) |> 
+  filter(blockcode != "practice", 
+         trialcode != "instructions") |> 
+  mutate(trialcode = case_when(trialcode == "prime_positive" ~ 1, 
+                               trialcode == "prime_negative" ~ 0,
+                               TRUE ~ NA),
+         prime_congruence = ifelse(trialcode == evaluative_response, 1, 0)) 
+
+# sanity check 1: if you consider all the combiantions of factor levels of trialcode, evaluative_response, and prime congruence, there should be only 4:
+data_amp_score_congruence |>
+  count(trialcode, evaluative_response, prime_congruence)
+
+data_amp_score_congruence |>
+  count(trialcode, evaluative_response, prime_congruence) |>
+  nrow() == 4
+
+# calculate AMP score 
+data_amp_score <- data_amp_score_congruence |> 
+  group_by(subject) |> 
+  summarize(AMP_score = mean(prime_congruence, na.rm = TRUE)) |> 
+  select(subject, AMP_score)
+
+# sanity check 2: check if AMP_score is numeric 
+is.numeric(data_amp_score$AMP_score)
+
+# sanity check 3: check if AMP_score is bounded [0,1]
+data_amp_score |> 
+  mutate(bounded_correctly = between(AMP_score, left = 0, right = 1)) |>
+  filter(bounded_correctly != TRUE) |>
+  nrow() == 0
 
 ```
 
@@ -146,6 +177,7 @@ TODO extract evaluations on the AMP test blocks and convert to an overall bias s
 # combine all dfs created in the previous chunks
 data_processed_temp <- dat_age_gender |>
   full_join(data_selfreport_scored, by = "subject") |> 
+  full_join(data_amp_score, by = "subject") |> 
   full_join(data_amp_performance_criteria, by = "subject") |>
   full_join(data_amp_completeness, by = "subject")
 
