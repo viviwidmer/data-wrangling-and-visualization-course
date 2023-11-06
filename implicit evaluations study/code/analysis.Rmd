@@ -31,6 +31,7 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(janitor)
+library(scales)
 
 ```
 
@@ -145,6 +146,17 @@ TODO add descriptive plots for self-reported evaluations
 
 ```{r}
 
+library(scales)
+
+ggplot(data_processed_after_exclusions, aes(x = mean_evaluation)) +
+  geom_histogram(binwidth = 1,
+                 boundary = 0,
+                 fill = "darkgreen", 
+                 color = "black") + 
+  xlab("AMP score") +
+  ylab("Frequency") +
+  theme_linedraw() +
+  scale_x_continuous(breaks = pretty_breaks(n = 7))
 
 ```
 
@@ -161,14 +173,41 @@ TODO add descriptive stats for AMP
 
 ### Descriptive plots
 
-TODO add descriptive plots for AMP
-
 ```{r}
 
+ggplot(data_processed_after_exclusions, aes(x = AMP_score)) +
+  geom_histogram(binwidth = 0.05,
+                 boundary = 0,
+                 fill = "darkgreen", 
+                 color = "black") + 
+  xlab("AMP score") +
+  ylab("Frequency") +
+  theme_linedraw() +
+  scale_x_continuous(breaks = pretty_breaks(n = 10))
 
 ```
 
 # Analyses & hypothesis tests
+
+## Self-reported evaluations are correlated with evaluations on the AMP
+
+### Plot
+
+```{r}
+
+ggplot(data_processed_after_exclusions, 
+       aes(x = AMP_score,
+           y = mean_evaluation)) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+
+ggplot(data_processed_after_exclusions, 
+       aes(y = AMP_score,
+           x = mean_evaluation)) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+
+```
 
 ## Self-reported evalautions
 
