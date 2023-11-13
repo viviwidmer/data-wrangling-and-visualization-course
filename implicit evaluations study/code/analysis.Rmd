@@ -119,44 +119,44 @@ Descriptive statistics and plots of the measures (excluding the demographics var
 # overall self-reported evaluations
 dat_mean_ratings <- data_processed_after_exclusions |>
   summarise(Mean = mean(mean_evaluation, na.rm = TRUE),
-            SD = sd(mean_evaluation, na.rm = TRUE)) |>
+            SD = sd(mean_evaluation, na.rm = TRUE),
+            n = n()) |>
   mutate(group = "Full sample")
 
 # self-reported evaluations by gender category
 dat_mean_ratings_by_gender <- data_processed_after_exclusions |>
   group_by(group = gender) |>
   summarise(Mean = mean(mean_evaluation, na.rm = TRUE),
-            SD = sd(mean_evaluation, na.rm = TRUE))
+            SD = sd(mean_evaluation, na.rm = TRUE),
+            n = n())
 
 # combine both into one table
 bind_rows(dat_mean_ratings,
           dat_mean_ratings_by_gender) |>
-  select(Subset = group, Mean, SD) |> # select variables of interest, and rename one 
+  select(Subset = group, Mean, SD, n) |> # select variables of interest, and rename one 
   mutate(Subset = stringr::str_to_sentence(Subset)) |> # Change the case of the Subset variable so that it prints nicely
   mutate_if(is.numeric, round_half_up, digits = 2) |>
   kable() |>
-  add_header_above(header = c(" " = 1, "Self-reported evaluations" = 2)) |>
+  add_header_above(header = c(" " = 1, "Self-reported evaluations" = 3)) |>
   kable_classic(full_width = FALSE)
 
 ```
 
-### Descriptive plots
-
-TODO add descriptive plots for self-reported evaluations
+### Descriptive plot
 
 ```{r}
-
-library(scales)
 
 ggplot(data_processed_after_exclusions, aes(x = mean_evaluation)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = "darkgreen", 
-                 color = "black") + 
-  xlab("AMP score") +
+                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
+                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+  xlab("Mean self-reported evaluation") +
   ylab("Frequency") +
   theme_linedraw() +
-  scale_x_continuous(breaks = pretty_breaks(n = 7))
+  scale_x_continuous(breaks = pretty_breaks(n = 7)) +
+  coord_cartesian(xlim = c(1, 7)) +
+  theme(panel.grid.minor = element_blank())
 
 ```
 
@@ -164,7 +164,7 @@ ggplot(data_processed_after_exclusions, aes(x = mean_evaluation)) +
 
 ### Descriptive stats
 
-TODO add descriptive stats for AMP
+\TODO add table of means, SDs, Ns
 
 ```{r}
 
@@ -178,8 +178,8 @@ TODO add descriptive stats for AMP
 ggplot(data_processed_after_exclusions, aes(x = AMP_score)) +
   geom_histogram(binwidth = 0.05,
                  boundary = 0,
-                 fill = "darkgreen", 
-                 color = "black") + 
+                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
+                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
   xlab("AMP score") +
   ylab("Frequency") +
   theme_linedraw() +
@@ -198,20 +198,43 @@ ggplot(data_processed_after_exclusions, aes(x = AMP_score)) +
 ggplot(data_processed_after_exclusions, 
        aes(x = AMP_score,
            y = mean_evaluation)) +
-  geom_jitter() +
-  geom_smooth(method = "lm")
+  geom_jitter(color = viridis_pal(begin = 0.45, option = "mako")(1),
+              alpha = 0.5) +
+  geom_smooth(method = "lm",
+              color = viridis_pal(begin = 0.45, option = "mako")(1)) +
+  xlab("AMP score") +
+  ylab("Mean self-reported evaluation") +
+  theme_linedraw() 
 
 ggplot(data_processed_after_exclusions, 
        aes(y = AMP_score,
            x = mean_evaluation)) +
-  geom_jitter() +
-  geom_smooth(method = "lm")
+  geom_jitter(color = viridis_pal(begin = 0.45, option = "mako")(1),
+              alpha = 0.5) +
+  geom_smooth(method = "lm",
+              color = viridis_pal(begin = 0.45, option = "mako")(1)) +
+  ylab("AMP score") +
+  xlab("Mean self-reported evaluation") +
+  theme_linedraw() 
+
+ggplot(data_processed_after_exclusions, 
+       aes(x = AMP_score,
+           y = mean_evaluation)) +
+  geom_jitter(color = viridis_pal(begin = 0.45, option = "mako")(1),
+              alpha = 0.5) +
+  xlab("AMP score") +
+  ylab("Mean self-reported evaluation") +
+  theme_linedraw() 
 
 ```
 
-## Self-reported evalautions
+More complex plots:
 
-TODO add t test comparing self-reported evaluations between men and women
+#### Axial hisograms
+
+Scatter plots with axial histograms using ggExtra: https://cran.r-project.org/web/packages/ggExtra/vignettes/ggExtra.html
+
+\TODO add axial histograms to a scatter plot. Split both the scatter plot and the histograms by gender.
 
 ```{r}
 
@@ -219,9 +242,97 @@ TODO add t test comparing self-reported evaluations between men and women
 
 ```
 
-## Evaluations on the Affect Misattribution Procedure
+#### Labelled points
 
-TODO add t test comparing AMP evaluations between men and women
+Label points using ggrepel: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html
+
+\TODO Label the points in a scatter plot using their participant codes.
+
+```{r}
+
+
+
+```
+
+#### Magnify areas
+
+Magnify areas of your plot with ggmagnify: https://hughjonesd.github.io/ggmagnify/
+
+\TODO Magnify an area of one of your scatter plots, eg where there are a lot of data points in a small area.
+
+```{r}
+
+
+
+```
+
+### Test
+
+\TODO 
+
+## Self-reported evalautions differ between men and women
+
+### Plot
+
+\TODO split histogram, split violin plot, raincloud plot, etc.
+
+```{r}
+
+
+
+```
+
+### Test
+
+\TODO 
+
+```{r}
+
+
+
+```
+
+## Evaluations on the Affect Misattribution Procedure differ between men and women
+
+### Plot
+
+\TODO split histogram, split violin plot, raincloud plot, etc.
+
+This time, vary the labeling and order of the legend, e.g., capitalise "Men" and "Women", and know how to change the order of the factors.
+
+```{r}
+
+
+
+```
+
+### Test
+
+\TODO 
+
+```{r}
+
+
+
+```
+
+## Combining plots
+
+Combine plots using patchwork: https://patchwork.data-imaginist.com/
+
+\TODO Combine at least three of the above plots into one.
+
+```{r}
+
+
+
+```
+
+## Saving plots
+
+Save plots to disk with `ggsave()`
+
+\TODO Save the above combined plot to disk as both .png and .pdf. Ensure the png has at least 300dpi resolution.
 
 ```{r}
 
