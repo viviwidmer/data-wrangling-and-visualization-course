@@ -26,6 +26,7 @@ knitr::opts_chunk$set(message = FALSE,
 library(tidyverse)
 library(janitor) # for clean_names()
 library(stringr)
+library(openxlsx)
 
 ```
 
@@ -226,6 +227,35 @@ dir.create("../data/processed/")
 write_csv(data_processed, "../data/processed/data_processed.csv")
 
 ```
+
+# Create codebook template for the processed data
+
+If it has not already been created, this code write the codebook template to disk. 
+
+\TODO The template should then be filled in manually with descriptions of each variable so that someone else could understand what these variables represent. 
+
+```{r}
+
+if(!file.exists("../data/processed/data_processed_codebook.xlsx")){
+  # convert the column names to a df
+  codebook_template <- data.frame(variable = colnames(data_processed)) |>
+    mutate(explanation = NA)
+  # write to disk as an excel file
+  write.xlsx(codebook_template, file = "../data/processed/data_processed_codebook.xlsx")
+}
+
+```
+
+Note that there are other ways of automatically creating more elaborate codebooks from your datasets. These often contain information about min/max/mean/SD, distribution, etc. For example:
+
+- Ruben Arslan's {codebook}
+  - [R package with How-Tos](https://rubenarslan.github.io/codebook/)
+  - [Tutorial](https://rubenarslan.github.io/codebook/articles/codebook_tutorial.html)
+  - [Article](https://journals.sagepub.com/doi/full/10.1177/2515245919838783)
+- Petersen & Ekstrøm's {dataReporter}
+  - [Article](https://www.jstatsoft.org/article/view/v090i06)
+  - [Blog](https://sandsynligvis.dk/2017/08/21/datamaid-your-personal-assistant-for-cleaning-up-the-data-cleaning-process/)
+  - [R package](https://cran.r-project.org/web/packages/dataReporter/index.html)
 
 # Session info
 
