@@ -234,7 +234,7 @@ More complex plots:
 
 Scatter plots with axial histograms using ggExtra: https://cran.r-project.org/web/packages/ggExtra/vignettes/ggExtra.html
 
-\TODO add axial histograms to a scatter plot. Split both the scatter plot and the histograms by gender.
+\TODO add axial histograms to a scatter plot. In a single plot, present different regression lines split by gender, and separate axial histograms for each gender.
 
 ```{r}
 
@@ -246,11 +246,15 @@ Scatter plots with axial histograms using ggExtra: https://cran.r-project.org/we
 
 Label points using ggrepel: https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html
 
-\TODO Label the points in a scatter plot using their participant codes.
+\TODO Label the points in a scatter plot using their participant codes. Label only the participants with more extreme scores.
 
 ```{r}
 
+colors <- viridis_pal(begin = 0.0, end = 1.0, option = "mako")(10)
 
+colors
+
+show_col(colors)
 
 ```
 
