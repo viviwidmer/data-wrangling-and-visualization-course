@@ -272,7 +272,7 @@ Magnify areas of your plot with ggmagnify: https://hughjonesd.github.io/ggmagnif
 
 ### Test
 
-\TODO run an appropriate test. Below the output, interpret the results. Consider using `easystats::report()`, but you can do this manually if you prefer.
+\TODO run an appropriate test. Below the output, interpret the results: write a few sentences that report and interpret the results following APA reporting style.
 
 ```{r}
 
