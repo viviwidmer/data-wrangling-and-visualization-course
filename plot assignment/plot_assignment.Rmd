@@ -49,6 +49,11 @@ Consider making use of the many extensions to ggplot2, e.g.:
 - ggsignif
 - and others: https://exts.ggplot2.tidyverse.org/gallery/
 
+Possible data sources:
+
+- osf.io
+- AIID dataset: https://osf.io/pcjwf/
+
 # Good plot
 
 ```{r}
