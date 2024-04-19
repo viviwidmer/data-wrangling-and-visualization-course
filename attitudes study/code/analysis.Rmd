@@ -1,0 +1,238 @@
+---
+title: "AIID wrangling"
+subtitle: "Analysis"
+author: "Template: Ian Hussey; content: [Student name]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+
+# set knit options
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+# disable scientific notation
+options(scipen = 999) 
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(janitor)
+library(scales)
+
+```
+
+# Data
+
+Test the hypothesis that "implicit biases towards african americans associated with the big 5 personality traits (Openness, Conscientsiouness, Extroversion, Agreeableness, Neurotticism("? Report results of a correlation test for each one (r, df, and p). These results should printed in a table with APA-like formatting in the .html produced by knitting the .Rmd file. Text and/or a table in the html file should interpret the magnitude of the correlation following Cohen's 1988 guidelines and p value.
+
+To do these analyses, process the data from its raw form in XXXX file. 
+
+What is the exclusion rate for this analaysis? ie what percent of the full sample of particiapnts was excluded prior to the analysis? These values should be printed in a table with APA-like formatting in the .html produced by knitting the .Rmd file.
+
+For what proportion of the analytic sample was demographcis data avialble (age and gnder)? For those participants in the anltyic sample for whom demogrpahcis data was avialble, what was their mean and SD age, and what percent were women? These values should be printed in a table with APA-like formatting in the .html produced by knitting the .Rmd file.
+
+What is the reliability of each of the BFI subsales [cronbach's alpha]? These values should be printed in a table with APA-like formatting in the .html produced by knitting the .Rmd file.
+
+Create scatter plots of the relationship between the IAT scores and the personality facets. These should include regression lines (DV: IAT score, IV: personality facet). The plots should color the dots by gender, but the regression line should not split by gender (ie there should be a single regression line. Outliers (defined as participants whose scores were > 1.5 SD from the mean) should use a triangular shape rather than a dot. A single combined plot should be created, contiaining 5 component plots, with the personality facet being examined in each clearly labelled. This plot should be printed in the html file but also saved to disk as both png/pdf.
+
+codebook!
+
+comments and code style and clarity
+
+minimise reuse of data frames, dont repeat yourself where sensible not to.
+
+Your assignment should be called XXXX and be located in your YYY github repo. It should contain a folder called code, and inside it should be the following files: 
+- analysis.Rmd
+- processing.Rmd
+
+communication/plots folder 
+
+```{r}
+
+load("../data/raw/AIID_subset_confirmatory.RData")
+load("../data/raw/AIID_subset_exploratory_with_zipcode.RData")
+load("../data/raw/AIID_subset_holdout.RData")
+
+dat <- 
+  bind_rows(AIID_subset_confirmatory,
+            AIID_subset_exploratory_with_zipcode,
+            AIID_subset_holdout)
+
+data_processed <- dat |>
+  select(
+    unique_id = session_id,
+    BFI_E_subscale, BFI_C_subscale, BFI_N_subscale, BFI_A_subscale, BFI_O_subscale,
+    starts_with("bfi_", ignore.case = FALSE),
+    iat_type, 
+    complete_individual_differences_data,
+    complete_iat_data,
+    exclude_iat,
+    IAT_score = D,
+    domain
+  )
+
+# data_processed |>
+#   select(starts_with("bfi_n", ignore.case = TRUE)) |>
+#   cor(use = "pairwise.complete.obs") |>
+#   round(2)
+
+data_processed_after_exclusions <- data_processed |>
+  # filter(complete_individual_differences_data == TRUE & 
+  #          exclude_iat == FALSE) |>
+  filter(
+    !is.na(BFI_E_subscale) |
+      !is.na(BFI_C_subscale) |
+      !is.na(BFI_N_subscale) |
+      !is.na(BFI_A_subscale) |
+      !is.na(BFI_O_subscale)
+  ) |>
+  filter(domain == "African Americans - European Americans" & 
+           iat_type == "Evaluation") |>
+  rename(bfi_e2_r = bfi_e2, 
+         bfi_e5_r = bfi_e5, 
+         bfi_e7_r = bfi_e7, 
+         bfi_c2_r = bfi_c2, 
+         bfi_c4_r = bfi_c4, 
+         bfi_c5_r = bfi_c5, 
+         bfi_c9_r = bfi_c9,
+         bfi_n2_r = bfi_n2, 
+         bfi_n5_r = bfi_n5, 
+         bfi_n7_r = bfi_n7, 
+         bfi_a1_r = bfi_a1, 
+         bfi_a3_r = bfi_a3, 
+         bfi_a6_r = bfi_a6, 
+         bfi_a8_r = bfi_a8, 
+         bfi_o7_r = bfi_o7, 
+         bfi_o9_r = bfi_o9) |>
+  mutate(bfi_e2 = ifelse(!is.na(bfi_e2_r), 7 - bfi_e2_r, NA),
+         bfi_e5 = ifelse(!is.na(bfi_e5_r), 7 - bfi_e5_r, NA),
+         bfi_e7 = ifelse(!is.na(bfi_e7_r), 7 - bfi_e7_r, NA),
+         bfi_c2 = ifelse(!is.na(bfi_c2_r), 7 - bfi_c2_r, NA),
+         bfi_c4 = ifelse(!is.na(bfi_c4_r), 7 - bfi_c4_r, NA),
+         bfi_c5 = ifelse(!is.na(bfi_c5_r), 7 - bfi_c5_r, NA),
+         bfi_c9 = ifelse(!is.na(bfi_c9_r), 7 - bfi_c9_r, NA),
+         bfi_n2 = ifelse(!is.na(bfi_n2_r), 7 - bfi_n2_r, NA),
+         bfi_n5 = ifelse(!is.na(bfi_n5_r), 7 - bfi_n5_r, NA),
+         bfi_n7 = ifelse(!is.na(bfi_n7_r), 7 - bfi_n7_r, NA),
+         bfi_a1 = ifelse(!is.na(bfi_a1_r), 7 - bfi_a1_r, NA),
+         bfi_a3 = ifelse(!is.na(bfi_a3_r), 7 - bfi_a3_r, NA),
+         bfi_a6 = ifelse(!is.na(bfi_a6_r), 7 - bfi_a6_r, NA),
+         bfi_a8 = ifelse(!is.na(bfi_a8_r), 7 - bfi_a8_r, NA),
+         bfi_o7 = ifelse(!is.na(bfi_o7_r), 7 - bfi_o7_r, NA),
+         bfi_o9 = ifelse(!is.na(bfi_o9_r), 7 - bfi_o9_r, NA)) |>
+  select(-bfi_e2_r,
+         -bfi_e5_r,
+         -bfi_e7_r,
+         -bfi_c2_r,
+         -bfi_c4_r,
+         -bfi_c5_r,
+         -bfi_c9_r,
+         -bfi_n2_r,
+         -bfi_n5_r,
+         -bfi_n7_r,
+         -bfi_a1_r,
+         -bfi_a3_r,
+         -bfi_a6_r,
+         -bfi_a8_r,
+         -bfi_o7_r,
+         -bfi_o9_r,
+         -BFI_E_subscale, 
+         -BFI_C_subscale, 
+         -BFI_N_subscale, 
+         -BFI_A_subscale, 
+         -BFI_O_subscale) %>%
+  select(unique_id, domain, iat_type, IAT_score, sort(colnames(.)))
+
+write_csv(data_processed_after_exclusions, "data_raw_bfi.csv")
+
+
+```
+
+
+```{r}
+
+
+dat_session_ids <- data_processed_after_exclusions |>
+  select(unique_id)
+
+dat1 <- read_csv("../data/raw/AIID_subset_confirmatory_iat_trial_data.csv")
+dat2 <- read_csv("../data/raw/AIID_subset_exploratory_iat_trial_data.csv")
+dat3 <- read_csv("../data/raw/AIID_subset_holdout_iat_trial_data.csv")
+
+dat1_subset <- dat1 |> semi_join(dat_session_ids, by = c("session_id" = "unique_id"))
+dat2_subset <- dat2 |> semi_join(dat_session_ids, by = c("session_id" = "unique_id"))
+dat3_subset <- dat3 |> semi_join(dat_session_ids, by = c("session_id" = "unique_id"))
+
+dat <- bind_rows(dat1_subset, 
+                 dat2_subset,
+                 dat3_subset) |>
+  rename(unique_id = session_id)|>
+  mutate(block_number = as.numeric(block_number) + 1,
+         trial_accuracy = ifelse(trial_error, "incorrect", "correct")) |>
+  select(unique_id, 
+         block_number = block_number,
+         block_required_responses = block_pairing_definition,
+         trial_response,
+         trial_accuracy,
+         trial_reaction_time_in_ms = trial_latency) |>
+  arrange(unique_id, block_number)
+
+dat |>
+  filter(block_number %in% c(3, 4, 6, 7)) |>
+  count(unique_id) |>
+  count(n)
+
+dat_onesub <- dat |>
+  filter(unique_id == "581474")
+
+
+write_csv(dat, "data_raw_iat.csv")
+
+
+```
+
+```{r}
+
+
+iat <- read.csv("data_raw_iat.csv")
+bfi <- read.csv("data_raw_bfi.csv")
+
+dat <-
+  bind_rows(
+    AIID_subset_confirmatory,
+    AIID_subset_exploratory_with_zipcode,
+    AIID_subset_holdout
+  ) |>
+  select(unique_id = session_id, age, sex) |>
+  mutate(age = as.character(age)) |>
+  pivot_longer(cols = -unique_id,
+               names_to = "variable",
+               values_to = "response")
+
+dat2 <- 
+  semi_join(dat, iat, by = "unique_id")
+
+dat3 <- dat |>
+  anti_join(iat, by = "unique_id") |>
+  sample_n(1822)
+
+dat_final <- bind_rows(dat2, dat3)
+
+write_csv(dat_final, "data_raw_demographics.csv")
+
+```
+
