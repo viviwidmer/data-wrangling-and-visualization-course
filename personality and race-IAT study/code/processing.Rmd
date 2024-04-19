@@ -1,0 +1,511 @@
+---
+title: "Examining the Relationship Between the Big-5 Personality Facets and Implicit Racial Attitudes"
+subtitle: "Data processing"
+author: "Ian Hussey"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse) 
+library(knitr)
+library(kableExtra)
+library(janitor)   
+library(openxlsx)  
+
+```
+
+# Load the Data
+
+```{r}
+
+# read in BFI data and immediately clean names
+data_bfi <- read_csv("../data/raw/data_raw_bfi.csv") |>
+  janitor::clean_names()
+
+# read in IAT data and immediately clean names
+data_iat <- read_csv("../data/raw/data_raw_iat.csv") |>
+  janitor::clean_names()
+
+# read in IAT data and immediately clean names
+data_demographics <- read_csv("../data/raw/data_raw_demographics.csv") |>
+  janitor::clean_names()
+
+```
+
+# Demographics
+
+Extract age and gender from the demographics raw file. All rows containing data from participants with a missing unique ID are removed (since they cannot be assigned to the other data, i.e. BFI and IAT, anyway). Missing values in the age and sex variable are substituted with "missing/error/others". "f" and "m" of the gender variable are recoded as "female" and "male".
+
+```{r}
+
+data_demographics_clean <- data_demographics |>
+  drop_na(unique_id) |> 
+  pivot_wider(names_from = "variable", values_from = "response") |> 
+  mutate(age = ifelse(is.na(age), "missing/error/others", age), 
+         sex = ifelse(is.na(sex), "missing/error/others", sex),
+         sex = recode(sex, "f" = "female", "m" = "male"),
+         unique_id = as.character(unique_id))
+
+```
+
+
+# BFI
+
+## Recoding
+
+In this section, the following is achieved:
+
+- Reverse negatively worded items
+- Check the successfulness of the recoding by calculating the correlation between each item on each separate subscale
+
+Note that item bfi_o7 and bfi_o10 negatively correlate after recoding. This might not be due to false reversal or implementation, but due to artefacts in the data. Regardless of the reason, the negative correlation is very small.
+
+```{r}
+
+# Construct a vector of all negatively worded items
+negatively_worded <- c("bfi_a1", "bfi_a3", "bfi_a6", "bfi_a8", 
+                       "bfi_c2", "bfi_c4", "bfi_c5", "bfi_c9",
+                       "bfi_e2", "bfi_e5", "bfi_e7", 
+                       "bfi_n2", "bfi_n5", "bfi_n7", 
+                       "bfi_o7", "bfi_o9")
+
+# Reverse negatively worded items with the vector constructed above
+data_bfi_recoded <- data_bfi |>
+  mutate(
+    across(all_of(negatively_worded), 
+           ~ recode(.x, `1` = 6, `2` = 5, `3` = 4,
+                    `4` = 3, `5` = 2, `6` = 1))
+    )
+
+```
+
+### Sanity Check
+
+Sanity check for the recoding (check correlation between items of each subscale). A correlation matrix for each subscale is created and printed. Then, the matrix is tested for negative values and the result is printed below the table (TRUE = only positive values; FALSE = negative values).
+
+#### Agreeableness
+
+```{r}
+
+# Construct and print correlation matrix
+cor_bfi_a <- data_bfi_recoded |> 
+  select(starts_with("bfi_a")) |> 
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame()
+
+cor_bfi_a |>
+  mutate(across(where(is.numeric), round_half_up, digits = 2)) |> 
+  kable() |>
+  kable_classic(full_width = 2)
+
+# Test for only positive values
+bfi_a_all_positive <- cor_bfi_a |> 
+  summarize(across(where(is.numeric), ~ all(. >= 0))) |> # summarize all positive values
+  all() # check if all values are positive
+  
+```
+
+BFI-A all correlations >= 0: `r bfi_a_all_positive`
+
+#### Conscientiousness
+
+```{r}
+
+# Construct and print correlation matrix
+cor_bfi_c <- data_bfi_recoded |> 
+  select(starts_with("bfi_c")) |> 
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame()
+
+cor_bfi_c |>
+  mutate(across(where(is.numeric), round_half_up, digits = 2)) |> 
+  kable() |>
+  kable_classic(full_width = 2)
+
+# Test for only positive values
+bfi_c_all_positive <- cor_bfi_c |> 
+  summarize(across(where(is.numeric), ~ all(. >= 0))) |> # summarize all positive values
+  all() # check if all values are positive
+  
+```
+
+BFI-C all correlations >= 0: `r bfi_c_all_positive`
+
+#### Extroversion
+
+```{r}
+
+# Construct and print correlation matrix
+cor_bfi_e <- data_bfi_recoded |> 
+  select(starts_with("bfi_e")) |> 
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame()
+
+cor_bfi_e |>
+  mutate(across(where(is.numeric), round_half_up, digits = 2)) |> 
+  kable() |>
+  kable_classic(full_width = 2)
+
+# Test for only positive values
+bfi_e_all_positive <- cor_bfi_e |> 
+  summarize(across(where(is.numeric), ~ all(. >= 0))) |> # summarize all positive values
+  all() # check if all values are positive
+  
+```
+
+BFI-E all correlations >= 0: `r bfi_e_all_positive`
+
+#### Neuroticism
+
+```{r}
+
+# Construct and print correlation matrix
+cor_bfi_n <- data_bfi_recoded |> 
+  select(starts_with("bfi_n")) |> 
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame()
+
+cor_bfi_n |>
+  mutate(across(where(is.numeric), round_half_up, digits = 2)) |> 
+  kable() |>
+  kable_classic(full_width = 2)
+
+# Test for only positive values
+bfi_n_all_positive <- cor_bfi_n |> 
+  summarize(across(where(is.numeric), ~ all(. >= 0))) |> # summarize all positive values
+  all() # check if all values are positive
+  
+```
+
+BFI-E all correlations >= 0: `r bfi_n_all_positive`
+
+#### Openness
+
+```{r}
+
+# Construct and print correlation matrix
+cor_bfi_o <- data_bfi_recoded |> 
+  select(starts_with("bfi_o")) |> 
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame()
+
+cor_bfi_o |>
+  mutate(across(where(is.numeric), round_half_up, digits = 2)) |> 
+  kable() |>
+  kable_classic(full_width = 2)
+
+# Test for only positive values
+bfi_o_all_positive <- cor_bfi_o |> 
+  summarize(across(where(is.numeric), ~ all(. >= 0))) |> # summarize all positive values
+  all() # check if all values are positive
+  
+```
+
+BFI-E all correlations >= 0: `r bfi_o_all_positive`
+
+## Impossible Values
+
+In this section, participants with impossible values (i.e. values below 1 and above 6) are marked as excluded. This will make it possible to exclude such participants from the analysis later on.
+
+```{r}
+
+# Check if there are impossible values. Participants with impossible values are first marked as "FALSE" and then as "excluded".
+data_bfi_exclude_impossible_values <- data_bfi_recoded |>
+  mutate(exclude_impossible_values = if_all(-unique_id, 
+                                            ~case_when(.x < 1 ~ FALSE,
+                                                       .x > 6 ~ FALSE,
+                                                       TRUE ~ TRUE))) |> 
+  mutate(across(where(is.logical), as.character)) |> 
+  mutate(exclude_impossible_values = recode(exclude_impossible_values, 
+                                           "FALSE" = "exclude", "TRUE" = "include"))
+
+```
+
+## Complete Subscales and Subscale Means
+
+In this section, the following is achieved:
+
+- Check if all subscales, which have been completed by the participants, do contain any missing values
+- Calculate the mean of the completed subscales for each participant
+- Check if the calculated means lay between 1 and 6 (TRUE indicates that this is the case)
+
+```{r}
+
+# Check for complete agreeableness subscale and calculate its mean
+
+# Note: exclude_impossible_values is selected too because all dfs generated here will be merged in the end for the final bfi df
+data_bfi_exclude_and_mean_a <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, starts_with("bfi_a"), exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_a = sum(is.na(c_across(starts_with("bfi_a"))))) |> # count NA values in the scale for each individual
+  mutate(exclusion_incomplete_scale_a = case_when(n_na_a < 1 ~ "include", # check if participants have a complete scale or did not fill out the scale at all
+                                                  n_na_a > 8 ~ "include", 
+                                                  TRUE ~ "exclude"), # exclude the participants with an incomplete completed scale
+         bfi_mean_a = mean(c_across(starts_with("bfi_a")), na.rm = TRUE)) |> # calculate the scale mean for each individual
+  mutate(bfi_mean_a = ifelse(is.nan(bfi_mean_a), NA, bfi_mean_a)) |> 
+  select(unique_id, bfi_mean_a)
+    
+# Check for complete conscientiousness subscale and calculate its mean (see first code block of this section for more detailed comments on the working of the code)
+data_bfi_exclude_and_mean_c <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, starts_with("bfi_c"), exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_c = sum(is.na(c_across(starts_with("bfi_c"))))) |> # count NA values in the scale for each individual
+  mutate(exclusion_incomplete_scale_c = case_when(n_na_c < 1 ~ "include", # check if participants have a complete scale or did not fill out the scale at all
+                                                  n_na_c > 8 ~ "include", 
+                                                  TRUE ~ "exclude"), # exclude the participants with an incomplete completed scale
+         bfi_mean_c = mean(c_across(starts_with("bfi_c")), na.rm = TRUE)) |> # calculate the scale mean for each individual
+  mutate(bfi_mean_c = ifelse(is.nan(bfi_mean_c), NA, bfi_mean_c)) |> 
+  select(unique_id, bfi_mean_c)
+
+# Check for complete extroversion subscale and calculate its mean (see first code block of this section for more detailed comments on the working of the code)
+data_bfi_exclude_and_mean_e <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, starts_with("bfi_e"), exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_e = sum(is.na(c_across(starts_with("bfi_e"))))) |> # count NA values in the scale for each individual
+  mutate(exclusion_incomplete_scale_e = case_when(n_na_e < 1 ~ "include", # check if participants have a complete scale or did not fill out the scale at all
+                                                  n_na_e > 8 ~ "include", 
+                                                  TRUE ~ "exclude"), # exclude the participants with an incomplete completed scale
+         bfi_mean_e = mean(c_across(starts_with("bfi_e")), na.rm = TRUE)) |> # calculate the scale mean for each individual
+  mutate(bfi_mean_e = ifelse(is.nan(bfi_mean_e), NA, bfi_mean_e)) |> 
+  select(unique_id, bfi_mean_e)
+
+# Check for complete neuroticism subscale and calculate its mean (see first code block of this section for more detailed comments on the working of the code)
+data_bfi_exclude_and_mean_n <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, starts_with("bfi_n"), exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_n = sum(is.na(c_across(starts_with("bfi_n"))))) |> # count NA values in the scale for each individual
+  mutate(exclusion_incomplete_scale_n = case_when(n_na_n < 1 ~ "include", # check if participants have a complete scale or did not fill out the scale at all
+                                                  n_na_n > 8 ~ "include", 
+                                                  TRUE ~ "exclude"), # exclude the participants with an incomplete completed scale
+         bfi_mean_n = mean(c_across(starts_with("bfi_n")), na.rm = TRUE)) |> # calculate the scale mean for each individual
+  mutate(bfi_mean_n = ifelse(is.nan(bfi_mean_n), NA, bfi_mean_n)) |> 
+  select(unique_id, bfi_mean_n)
+
+# Check for complete openness subscale and calculate its mean (see first code block of this section for more detailed comments on the working of the code)
+data_bfi_exclude_and_mean_o <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, starts_with("bfi_o"), exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_o = sum(is.na(c_across(starts_with("bfi_o"))))) |> # count NA values in the scale for each individual
+  mutate(exclusion_incomplete_scale_o = case_when(n_na_o < 1 ~ "include", # check if participants have a complete scale or did not fill out the scale at all
+                                                  n_na_o > 8 ~ "include", 
+                                                  TRUE ~ "exclude"), # exclude the participants with an incomplete completed scale
+         bfi_mean_o = mean(c_across(starts_with("bfi_o")), na.rm = TRUE)) |> # calculate the scale mean for each individual
+  mutate(bfi_mean_o = ifelse(is.nan(bfi_mean_o), NA, bfi_mean_o)) |> 
+  select(unique_id, bfi_mean_o)
+
+# Merge all the BFI exclusions/subscale mean tables into one
+data_bfi_scored <- data_bfi_exclude_and_mean_a |>
+  full_join(data_bfi_exclude_and_mean_c, by = "unique_id") |> 
+  full_join(data_bfi_exclude_and_mean_e, by = "unique_id") |> 
+  full_join(data_bfi_exclude_and_mean_n, by = "unique_id") |> 
+  full_join(data_bfi_exclude_and_mean_o, by = "unique_id") |> 
+  mutate(unique_id = as.character(unique_id))
+
+# Sanity check for all BFI subscales (check if means are between 1 and 6)
+sanity_check_means <- data_bfi_scored |> 
+  pivot_longer(cols = -unique_id) |>
+  drop_na(value) |>
+  summarize(bounded_correctly = as.logical(min(value >= 1 & value <= 6))) |>
+  pull(bounded_correctly)
+
+```
+
+All means are within the bounds [1, 6]: `r sanity_check_means`
+
+# IAT - GOT TO HERE
+
+## Cleaning
+
+This section cleans the IAT data (get the right column headers, clean the column names, rename the columns/variables, select relevant variables and blocks)
+
+```{r IAT}
+
+# Some data wrangling/tidying for the IAT data (change header names, clean/rename header names, select relevant columns and rows)
+data_iat_clean <- data_iat |> 
+  janitor::row_to_names(row_number = 1) |> 
+  janitor::clean_names() |> 
+  rename(trial_rt = trial_reaction_time_in_ms) |> 
+  select(unique_id, block_number, trial_accuracy, trial_rt) |>
+  mutate(trial_rt = as.numeric(trial_rt)) |> 
+  filter(!block_number %in% c(1,2,5)) # filter out non-critical blocks 
+
+```
+
+
+## D-score
+
+In this section Greenwald's D-score is calculated. This measure is defined as the mean in the IAT blocks 4 and 7 (mean2) subtracted by the mean of the IAT blocks 3 and 6 (mean1) divided by the SD of the critical blocks 3, 4, 6, and 7 (SD). The D-score should lay between -2 and 2. A sanity check is conducted in the end to confirm that this is the case (TRUE indicates that all scores are bounded between -2 and 2).
+
+```{r}
+
+# Calculate mean1 (mean of block 3 and 6)
+data_iat_mean1 <- data_iat_clean |> 
+  filter(block_number %in% c(3, 6)) |> 
+  group_by(unique_id) |> 
+  summarize(mean1 = mean(trial_rt, na.rm = TRUE))
+
+# Calculate mean2 (mean of block 4 and 7)
+data_iat_mean2 <- data_iat_clean |> 
+  filter(block_number %in% c(4, 7)) |> 
+  group_by(unique_id) |> 
+  summarize(mean2 = mean(trial_rt, na.rm = TRUE))
+    
+# Calculate SD (SD of block 3, 4, 6, 7)
+data_iat_SD <- data_iat_clean |> 
+  filter(block_number %in% c(3, 4, 6 ,7)) |> 
+  group_by(unique_id) |> 
+  summarize(SD = sd(trial_rt, na.rm = TRUE))
+
+# Merge all the statistics to calculate the d score (mean2 - mean1 / SD)
+data_iat_scored <- full_join(data_iat_mean1, data_iat_mean2, by = "unique_id") |> 
+  full_join(data_iat_SD, by = "unique_id") |> 
+  group_by(unique_id) |> 
+  summarize(d_score = (mean2 - mean1)/SD)
+
+# Sanity check (scores are bounded between -2 and +2)
+data_iat_scored |> 
+  mutate(bounded_correctly = between(d_score, left = -2, right = 2)) |>
+  filter(bounded_correctly != TRUE) |> # filter out the rows with values that surpass the bounds
+  nrow() == 0 # number of rows should be zero (no bounds are crossed)
+  
+```
+
+
+## Exclusions
+
+In this section, participants are marked as excluded according to the following criteria:
+
+- Incomplete/deviating critical IAT block data (trial number of participant deviates from 120).  
+- Too many fast answers in the critical IAT blocks (10% of the responses are under 300ms)
+- Bad accuracy in the critical IAT blocks (accuracy is below 75%)
+
+At the end, all exclusion data frames are joined together.
+
+```{r}
+
+# exclude participants with incomplete/deviating trial data (deviating from 120 trials)
+data_iat_incomplete_trial_exclusion <- data_iat_clean |> 
+  group_by(unique_id) |> 
+  count() |> 
+  mutate(exclusion_incomplete_trials_IAT = ifelse(n == 120, "include", "exclude"))
+
+# exclude participants with too many fast answers, i.e. bad adherence/performance (more than 10% of the trials are answered faster than 300ms)
+data_iat_fast_answers_exclusion <- data_iat_clean |> 
+  mutate(fast_answer = ifelse(trial_rt < 300, TRUE, FALSE)) |> # mark fast responses (< 300ms)
+  group_by(unique_id) |> 
+  summarize(proportion_fast_answer_IAT = mean(fast_answer)) |>
+  mutate(exclusion_IAT_performance = ifelse(proportion_fast_answer_IAT > 0.10, "exclude", "include")) # mark participants as excluded if they answer fast in more than 10% of the trials
+
+# exclude participants with bad accuracy (< 75%)
+data_iat_accuracy_exclusion <- data_iat_clean |> 
+  mutate(trial_accuracy = recode(trial_accuracy, "correct" = TRUE, "incorrect" = FALSE)) |> # recode the accuracy variable to get the proportion of accurate answers more easily
+  group_by(unique_id) |> 
+  summarize(proportion_accurate_answers_IAT = mean(trial_accuracy)) |>
+  mutate(exclusion_IAT_accuracy = ifelse(proportion_accurate_answers_IAT < 0.75, "exclude", "include")) # mark participants as excluded if they have an accuracy below 75%
+
+# merge all IAT exclusion tables into one
+data_iat_exclusions <- full_join(data_iat_incomplete_trial_exclusion, data_iat_fast_answers_exclusion, by = "unique_id") |> 
+  full_join(data_iat_accuracy_exclusion, by = "unique_id")
+
+```
+
+
+## Merge all the IAT Tables
+
+```{r}
+
+# join IAT data and IAT exclusion table
+data_iat_all <- full_join(data_iat_scored, data_iat_exclusions, by = "unique_id") |> 
+  select(unique_id, d_score, exclusion_incomplete_trials_IAT, exclusion_IAT_performance, exclusion_IAT_accuracy) 
+
+```
+
+
+# Merge all Tables
+
+```{r} 
+
+# create a table of the complete data (i.e. demographics, bfi, and IAT)
+data_complete <- full_join(data_demographics_clean, data_bfi_scored, by = "unique_id") |> 
+  full_join(data_iat_all, by = "unique_id")
+
+```
+
+
+# Master Exclusions
+
+Apply master exclusions. Note that participants with no IAT data are also marked as excluded here (based on the rational that they do not have 120 IAT trials). This keeps them out of the analysis.
+
+```{r}
+
+# Mark participants as excluded if they have been excluded according to any of the exclusion criteria above
+data_processed <- data_complete |> 
+  mutate(exclude_participant = case_when(exclusion_incomplete_scale_a == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_c == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_e == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_n == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_o == "exclude" ~ "exclude",
+                                         exclude_impossible_values == "exclude" ~ "exclude",
+                                         exclusion_incomplete_trials_IAT == "exclude" ~ "exclude",
+                                         is.na(exclusion_incomplete_trials_IAT) ~ "exclude",
+                                         exclusion_IAT_performance == "exclude" ~ "exclude",
+                                         exclusion_IAT_accuracy == "exclude" ~ "exclude", 
+                                         TRUE ~ "include"))
+
+```
+
+
+# Write to Disk
+
+```{r}
+
+# in case this dir doesn't exist, create it
+dir.create("../data/processed/")
+
+# save data to disk in that dir
+write_csv(data_processed, "../data/processed/data_processed.csv")
+
+```
+
+# Create Codebook Template for the Processed Data
+
+If it has not already been created, this code write the codebook template to disk. Note that the variable explanations must be added manually.
+
+```{r}
+
+if(!file.exists("../data/processed/data_processed_codebook.xlsx")){
+  # convert the column names to a df
+  codebook_template <- data.frame(variable = colnames(data_processed)) |>
+    mutate(explanation = NA) |> 
+    mutate(type = lapply(data_processed, class))
+  # write to disk as an excel file
+  write.xlsx(codebook_template, file = "../data/processed/data_processed_codebook.xlsx")
+}
+
+```
+
+
+# Session Info
+
+```{r}
+
+sessionInfo()
+
+```
