@@ -1,0 +1,6 @@
+
+Write code to provide an appropriate test of the hypothesis that each of the Big 5 personality traits are associated with 
+
+
+- codebooks
+- ugly and pretty plots
