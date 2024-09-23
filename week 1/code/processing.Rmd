@@ -1,0 +1,139 @@
+---
+title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
+subtitle: "Data processing"
+author: "Template: Ian Hussey; content: [Student name]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor) # for clean_names()
+library(stringr)
+
+```
+
+# Get data
+
+```{r}
+
+# demographics
+data_demographics_raw_messy <- read_csv("../data/raw/data_demographics_raw_messy.csv", skip = 2) |>
+  janitor::clean_names()
+
+data_demographics_raw <- read_csv("../data/raw/data_demographics_raw.csv") |>
+  janitor::clean_names()
+
+# self report measure
+data_selfreport_raw <- read_csv("../data/raw/data_selfreport_raw.csv") |>
+  janitor::clean_names()
+
+# affect attribution procedure
+data_amp_raw <- read_csv("../data/raw/data_amp_raw.csv") |>
+  janitor::clean_names()
+
+```
+
+# Demographics
+
+Clean the demographics data so that summaries of age and gender can be made in the analysis.
+
+```{r}
+
+#dat_age_gender <- data_demographics_raw 
+
+```
+
+# Exclusions / data quality
+
+## AMP
+
+Create an exclusion variable `exclude_amp_performance` based on AMP performance: "exclude" if more than 10% of trials are < 100ms, or "include" if not.
+
+Create an exclusion variable `exclude_amp_completeness` based on the AMP having the right number of trials.
+
+```{r}
+
+#data_amp_performance_criteria <- data_amp_raw 
+
+```
+
+# Self-reports
+
+Create a mean score for each participant of the three self-report items.
+
+```{r}
+
+#data_selfreport_trial_level <- data_selfreport_raw 
+
+```
+
+# Affect Misattribution Procedure
+
+Create an overall AMP bias score. Score each trial as having been evalauted as congruent with the prime or not. eg When trialcode == "prime_positive" & evaluative_response == 1, then record as 1, etc. AMP score is the proportion of congruent responses.
+
+```{r}
+
+#data_amp_score_congruence <- data_amp_raw 
+
+```
+
+# Combine 
+
+Combine data frames together to create one wide-format data frame where each row represents a participant.
+
+Flag all duplicates for exclusion.
+
+```{r}
+
+# data_processed_before_exclusions 
+
+```
+
+# Define master exclusion variable
+
+```{r}
+
+#data_processed <- data_processed_before_exclusions
+
+```
+
+# Write to disk
+
+```{r}
+
+# # in case this dir doesn't exist, create it
+# dir.create("../data/processed/")
+# 
+# # save data to disk in that dir
+# write_csv(data_processed, "../data/processed/data_processed.csv")
+
+```
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
