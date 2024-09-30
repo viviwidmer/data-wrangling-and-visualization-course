@@ -82,7 +82,11 @@ Useful arguments:
 
 ```{r}
 
+# pipe --> "and then" %>% there is a shortcut which i forgot. (look up!)
+# 
+# cmd + doppelklick auf ein Objekt (Wort) öffnet den Datensatz
 
+#to add # to multiple lines: Ctrl + shift + C
 
 # readr::read_csv()
 
@@ -163,6 +167,7 @@ slice(mtcars, 2:n()) # this should have 31 rows
 
 # dplyr::select()
 
+what does select do? --> look it up
 ```
 
 ## rename
