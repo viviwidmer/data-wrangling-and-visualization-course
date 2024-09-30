@@ -36,7 +36,7 @@ library(stringr)
 ```{r}
 
 # demographics
-data_demographics_raw_messy <- read_csv("../data/raw/data_demographics_raw_messy.csv", skip = 2) |>
+data_demographics_raw_messy <- read_csv("../dat %>% a/raw/data_demographics_raw_messy.csv", skip = 2) |>
   janitor::clean_names()
 
 data_demographics_raw <- read_csv("../data/raw/data_demographics_raw.csv") |>
@@ -60,6 +60,45 @@ Clean the demographics data so that summaries of age and gender can be made in t
 
 #dat_age_gender <- data_demographics_raw 
 
+#dat_age_gender <- data_demographics_raw %>%
+ # rename(unique_id = subject, item = trialcode) %>%
+  #select(unique_id, item, response)
+
+#temp <- dat_age_gender %>%
+#  filter(item == "age")
+
+# wrangle the demographics data out of the raw
+dat_age_gender <- data_demographics_raw %>%
+  # rename for clarity
+  rename(unique_id = subject, item = trialcode) %>%
+  # select useful columns
+  select(unique_id, item, response) %>%
+  # retain raws that we need
+  filter(item == "age")
+
+#run the code again to check if it runs 
+#look at the data to see if it's the way i like it to be
+
+temp <- dat_age_gender %>%
+  distinct(response)
+
+#temp2 <- dat_age_gender %>% 
+  #mutate allows you to change or create variables
+ # mutate(unique_id_2 = unique_id * 2)
+#we want to change response 
+
+#went and asked chat gpt
+temp2 <- dat_age_gender %>%
+ # mutate(response = str_replace_all(response, " [^[:alnum:]]"))
+  #because we want to remove all non numeric characters instead of replace: 
+  mutate(response = str_remove_all(response, "\\D"),
+         response = na_if(response, ""))
+
+
+
+#check data type (just an useful fyi)
+sapply(dat_age_gender, class)
+  
 ```
 
 # Exclusions / data quality
