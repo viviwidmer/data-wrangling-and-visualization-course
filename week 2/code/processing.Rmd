@@ -95,6 +95,10 @@ temp2 <- dat_age_gender %>%
          response = na_if(response, ""))
 
 
+#homework: do the same for gender! (Think of what could go wrong)
+
+
+
 
 #check data type (just an useful fyi)
 sapply(dat_age_gender, class)
