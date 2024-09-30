@@ -96,6 +96,9 @@ temp2 <- dat_age_gender %>%
 
 
 #homework: do the same for gender! (Think of what could go wrong)
+#to add # to multiple lines: Ctrl + shift + C
+
+
 
 
 
