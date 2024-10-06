@@ -95,14 +95,95 @@ temp2 <- dat_age_gender %>%
          response = na_if(response, ""))
 
 
-#homework: do the same for gender! (Think of what could go wrong)
+#homework for 7.10.24: do the same for gender! (Think of what could go wrong)
 #to add # to multiple lines: Ctrl + shift + C
 
+#temp <- dat_age_gender %>%
+#  filter(item == "gender")
+
+# wrangle the demographics data out of the raw
+dat_age_gender <- data_demographics_raw %>%
+  # rename for clarity
+  rename(unique_id = subject, item = trialcode) %>%
+  # select useful columns
+  select(unique_id, item, response) %>%
+  # retain raws that we need
+  filter(item == "gender")
+
+#run the code again to check if it runs 
+#look at the data to see if it's the way i like it to be
+
+temp2 <- dat_age_gender %>%
+  distinct(response)
+
+#wieso zeigt es mir nur 11 Zeilen an??
+
+#possible issues: 
+# The answers are in character, so everyone wrote the answer differently. All caps, no caps, somebody wrote 23?, Someone wrote yes. OVer all the data is not ready to work with...
+
+#wrangle the demographics data out of the raw
+
+#temp2 <- dat_age_gender %>% 
+  #mutate allows you to change or create variables
+ # mutate(unique_id_2 = unique_id * 2)
+#we want to change response 
+
+temp5 <- dat_age_gender %>% 
+  rename(any_of("male" = "MALE", "Male"))
+  rename(any_of("female" = "Female", "FEMALE"))
+  rename(any_of("non-binary" = "NON-BINARY", "non binary", "NON BINARY", "Non-Binary", "Non-binary", "Non Binary", "Non binary", "non-Binary", "non Binary", "nonbinary", "NONBINARY"))
+
+temp5 <- dat_age_gender %>%
+  distinct(response) 
+
+#For some reason it doesn't work at all
+# What I would want to do: 
+#   Change the answers from total chaos to either male, female or non-binary, maybe even just male or female
+#   then exclude the funny answers (23, yes,...)
+#depending on what i would want to do later on with the data i would consider changing the answers to a numeric system like 0 = mal, 1 = female, or 1 = male, 2 = female
+
+#2. Versuch mithilfe eines YT Videos
+#https://www.youtube.com/watch?v=224AetNhv3M
+
+install.packages("car")
+library(car)
+
+dat_age_gender$gender_rekodiert <- Recode(dat_age_gender$response, 
+                                          "male" = "Male";
+                                          "female" = "Female")
+#doesn't seem to work either, maybe cause it's letters/ words instead of numbers that the guy in the yt video used?
+
+# 3. Try, Chat-GPT second attempt. 
+###
+# 1. Einheitliche Groß-/Kleinschreibung verwenden
+# Du kannst die Groß-/Kleinschreibung einheitlich gestalten, um sicherzustellen, dass alle Werte in derselben Form vorliegen, z. B. alles klein oder alles groß schreiben.
+# 
+# r
+# Code kopieren
+# # Beispiel-Daten
+# df <- data.frame(Item = c("Apfel", "apfel", "Banane", "banane", "APFEL"))
+# 
+# # Alles in Kleinbuchstaben umwandeln
+# df$Item <- tolower(df$Item)
+# 
+# # Oder: Alles in Großbuchstaben umwandeln
+# # df$Item <- toupper(df$Item)
+# 
+# print(df)
+###
+
+gender_umkodiert <- dat_age_gender(Item = c("Male", "male", "MALE"))
+gender_umkodiert$response <- tolower(gender_umkodiert$response)
+
+gender_umkodiert <- dat_age_gender %>%
+  distinct(response) 
 
 
 
 
 
+
+#to add # to multiple lines: Ctrl + shift + C
 #check data type (just an useful fyi)
 sapply(dat_age_gender, class)
   
